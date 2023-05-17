@@ -21,7 +21,7 @@ import static ru.practicum.stat.Constants.dateTimeFormatter;
 
 @Service
 public class StateClient extends BaseClient {
-    private final ObjectMapper mapper  = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
     private final TypeReference<List<ViewStats>> mapType = new TypeReference<>() {
     };
 
@@ -36,9 +36,9 @@ public class StateClient extends BaseClient {
     }
 
     public ResponseEntity<Object> saveHit(String app,
-                        String uri,
-                        String ip,
-                        LocalDateTime timestamp) {
+                                          String uri,
+                                          String ip,
+                                          LocalDateTime timestamp) {
         EndpointHit endpointHitDto = new EndpointHit(app, uri, ip, timestamp);
         return post("/hit", endpointHitDto);
     }

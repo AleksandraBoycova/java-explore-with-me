@@ -29,7 +29,7 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public List<ViewStats> getStatistics(String start, String end, List<String> uris, boolean unique) {
         LocalDateTime startDate = LocalDateTime.parse(URLDecoder.decode(start, StandardCharsets.UTF_8), dateTimeFormatter);
-        LocalDateTime endDate   = LocalDateTime.parse(URLDecoder.decode(end, StandardCharsets.UTF_8), dateTimeFormatter);
+        LocalDateTime endDate = LocalDateTime.parse(URLDecoder.decode(end, StandardCharsets.UTF_8), dateTimeFormatter);
         if (unique) {
             if (uris != null && !uris.isEmpty()) {
                 return repository.findAllByTimestampBetweenAndUriInUnique(startDate, endDate, uris);
