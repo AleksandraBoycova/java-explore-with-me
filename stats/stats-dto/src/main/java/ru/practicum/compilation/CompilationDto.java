@@ -12,7 +12,7 @@ public class CompilationDto {
 
     private Boolean pinned;
 
-    private String        title;
+    private String title;
 
     private Set<EventDto> events;
 }

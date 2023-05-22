@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class CompilationServiceImpl implements CompilationService {
 
     private final CompilationRepository compilationRepository;
-    private final EventRepository       eventRepository;
+    private final EventRepository eventRepository;
 
     public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
         Page<CompilationEntity> compilationEntities = compilationRepository.findAllByPinned(pinned, PageRequest.of(from / size, size, Sort.by("id")));
@@ -44,14 +44,14 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto addCompilation(NewCompilationDto compilation) {
         if (compilation.getEvents() != null && compilation.getEvents().size() != 0) {
-            Set<Long>         eventIds          = compilation.getEvents();
-            Set<EventEntity>  events            = new HashSet<>(eventRepository.findAllByIdIn(eventIds));
+            Set<Long> eventIds = compilation.getEvents();
+            Set<EventEntity> events = new HashSet<>(eventRepository.findAllByIdIn(eventIds));
             CompilationEntity compilationEntity = CompilationMapper.toEntity(compilation);
             compilationEntity.setEvents(events);
             CompilationEntity savedCompil = compilationRepository.save(compilationEntity);
             return CompilationMapper.toDto(savedCompil);
         }
-        CompilationEntity fromDto     = CompilationMapper.toEntity(compilation);
+        CompilationEntity fromDto = CompilationMapper.toEntity(compilation);
         CompilationEntity savedCompil = compilationRepository.save(fromDto);
         return CompilationMapper.toDto(savedCompil);
     }
@@ -71,8 +71,8 @@ public class CompilationServiceImpl implements CompilationService {
         CompilationEntity compilationFromDb = compilationRepository.findById(compId).orElseThrow(() ->
                 new NotFoundException("Такой подборки нет " + compId));
         if (compilation.getEvents().size() != 0) {
-            Set<Long>        eventIds = compilation.getEvents();
-            Set<EventEntity> events   = new HashSet<>(eventRepository.findAllByIdIn(eventIds));
+            Set<Long> eventIds = compilation.getEvents();
+            Set<EventEntity> events = new HashSet<>(eventRepository.findAllByIdIn(eventIds));
             compilationFromDb.setEvents(events);
         }
         if (compilation.getPinned() != null) {

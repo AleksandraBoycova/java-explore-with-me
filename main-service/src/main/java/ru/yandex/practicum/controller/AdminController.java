@@ -82,7 +82,7 @@ public class AdminController {
     @GetMapping("/users")
     public List<UserDto> getUsers(@RequestParam(name = "ids", required = false) List<Long> userIds,
                                   @RequestParam(name = "from", defaultValue = "0")
-    Integer from, @RequestParam(name = "size", defaultValue = "10") Integer size) {
+                                  Integer from, @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Admin: Вызван метод getUsers {}, size {}, from {}", userIds, from, size);
         return userService.getUsers(userIds, from, size);
     }

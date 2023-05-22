@@ -16,6 +16,7 @@ public class CompilationMapper {
         compilationDto.setEvents(compilationEntity.getEvents().stream().map(EventMapper::toShortDto).collect(Collectors.toSet()));
         return compilationDto;
     }
+
     public static CompilationEntity toEntity(NewCompilationDto dto) {
         CompilationEntity entity = new CompilationEntity();
         entity.setPinned(dto.getPinned());

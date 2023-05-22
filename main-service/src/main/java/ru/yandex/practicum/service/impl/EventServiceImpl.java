@@ -40,11 +40,11 @@ import static ru.practicum.stat.Constants.dateTimeFormatter;
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
-    private final EventRepository    eventRepository;
+    private final EventRepository eventRepository;
     private final LocationRepository locationRepository;
     private final CategoryRepository categoryRepository;
-    private final UserRepository     userRepository;
-    private final StateClient        stateClient;
+    private final UserRepository userRepository;
+    private final StateClient stateClient;
 
     @Override
     public List<EventDto> getEvents(String text, List<Long> categoriesIds, Boolean paid, String rangeStart,
@@ -52,7 +52,7 @@ public class EventServiceImpl implements EventService {
                                     Integer size, HttpServletRequest request) {
 
         LocalDateTime start = null;
-        LocalDateTime end   = null;
+        LocalDateTime end = null;
 
         if (rangeStart != null && rangeEnd != null) {
             start = LocalDateTime.parse(rangeStart, dateTimeFormatter);
@@ -79,10 +79,10 @@ public class EventServiceImpl implements EventService {
             return Collections.emptyList();
         }
         Predicate<EventEntity> eventEntityPredicate;
-        if(text != null && !text.isEmpty()){
+        if (text != null && !text.isEmpty()) {
             eventEntityPredicate = eventEntity -> eventEntity.getAnnotation().toLowerCase().contains(text.toLowerCase())
                     || eventEntity.getDescription().toLowerCase().contains(text.toLowerCase());
-        }else{
+        } else {
             eventEntityPredicate = eventEntity -> true;
         }
 
@@ -150,7 +150,7 @@ public class EventServiceImpl implements EventService {
     public List<EventDto> searchEvents(List<Long> userIds, List<String> states, List<Long> categories,
                                        String rangeStart, String rangeEnd, Integer from, Integer size, HttpServletRequest
                                                request) {
-        int               page        = from / size;
+        int page = from / size;
         final PageRequest pageRequest = PageRequest.of(page, size);
         if (states == null & rangeStart == null & rangeEnd == null) {
             return eventRepository.findAll().stream().map(EventMapper::toPublicApiDto).collect(Collectors.toList());
@@ -217,7 +217,7 @@ public class EventServiceImpl implements EventService {
             throw new NotFoundException("Такого пользователя нет");
         }
         Page<EventEntity> eventsWithPage = eventRepository.findAllByUserWithPage(userId, PageRequest.of(from / size, size));
-        List<EventEntity> events         = eventsWithPage.getContent();
+        List<EventEntity> events = eventsWithPage.getContent();
         return events.stream().map(EventMapper::toShortDto).collect(Collectors.toList());
     }
 
