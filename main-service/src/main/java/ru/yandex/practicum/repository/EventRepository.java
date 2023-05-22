@@ -18,16 +18,12 @@ import java.util.Optional;
 public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
     @Query("SELECT e FROM EventEntity e " +
-            "JOIN e.initiator " +
             "JOIN e.category " +
-            "WHERE (:categoryIds is null or e.category.id IN :categoryIds) " +
+            "WHERE ((:categoryIds) is null or e.category.id IN (:categoryIds)) " +
             "AND e.state = 'PUBLISHED' " +
-            "AND (:text is null or lower(e.annotation) like %:text%) " +
             "AND (:paid is null or paid is :paid) " +
-            "OR (:text is null or lower(e.description) like %:text%) " +
             "AND e.eventDate BETWEEN :rangeStart AND :rangeEnd")
-    Page<EventEntity> searchPublishedEvents(@Param("text") String text,
-                                            @Param("categoryIds") List<Long> categoryIds,
+    Page<EventEntity> searchPublishedEvents(@Param("categoryIds") List<Long> categoryIds,
                                             @Param("paid") Boolean paid,
                                             @Param("rangeStart") LocalDateTime start,
                                             @Param("rangeEnd") LocalDateTime end,
@@ -41,9 +37,11 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             "AND e.state IN :states " +
             "AND e.category.id IN :categories " +
             "AND e.eventDate BETWEEN :rangeStart AND :rangeEnd")
-    Page<EventEntity> findAllWithAllParameters(@Param("userIds") List<Long> userIds, @Param("states") List<State> states,
-                                               @Param("categories") List<Long> categories, @Param("rangeStart") LocalDateTime rangeStart,
-                                               @Param("rangeEnd") LocalDateTime rangeEnd, PageRequest pageRequest);
+    Page<EventEntity> findAllWithAllParameters(@Param("userIds") List<Long> userIds,
+                                               @Param("states") List<State> states,
+                                               @Param("categories") List<Long> categories,
+                                               @Param("rangeStart") LocalDateTime rangeStart,
+                                               @Param("rangeEnd") LocalDateTime rangeEnd, Pageable pageable);
 
     @Query("SELECT e FROM EventEntity e " +
             "JOIN e.category " +
@@ -52,13 +50,13 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             "AND e.eventDate BETWEEN:rangeStart AND:rangeEnd")
     Page<EventEntity> findAllEventsWithoutIdList(@Param("categories") List<Long> categories, @Param("states") List<State> states,
                                                  @Param("rangeStart") LocalDateTime rangeStart,
-                                                 @Param("rangeEnd") LocalDateTime rangeEnd, PageRequest pageRequest);
+                                                 @Param("rangeEnd") LocalDateTime rangeEnd, Pageable pageable);
 
     @Query("SELECT e FROM EventEntity e " +
             "JOIN e.initiator " +
             "JOIN e.category " +
             "WHERE e.initiator.id = :userId")
-    Page<EventEntity> findAllByUserWithPage(@Param("userId") Long userId, PageRequest pageRequest);
+    Page<EventEntity> findAllByUserWithPage(@Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT e FROM EventEntity e " +
             "WHERE e.id = :id " +
@@ -69,5 +67,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             "JOIN e.category " +
             "WHERE e.category.id = :catId")
     Optional<List<EventEntity>> findAllByCategoryId(Long catId);
+
+    List<EventEntity> findAllByIdIn(Iterable<Long> ids);
 
 }

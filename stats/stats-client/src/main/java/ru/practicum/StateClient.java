@@ -13,9 +13,9 @@ import ru.practicum.stat.EndpointHit;
 import ru.practicum.stat.ViewStats;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.practicum.stat.Constants.dateTimeFormatter;
 
@@ -66,5 +66,27 @@ public class StateClient extends BaseClient {
         return viewStatsList != null && !viewStatsList.isEmpty() ? viewStatsList.get(0).getHits() : 0L;
     }
 
+    public Map<Long, Long> getSetViewsByEventId(Set<Long> eventIds) {
+        Map<String, Object> parameters = Map.of(
+                "start", LocalDateTime.now().minusYears(1000).format(dateTimeFormatter),
+                "end", LocalDateTime.now().plusYears(1000).format(dateTimeFormatter),
+                "uris", (eventIds.stream().map(id -> "/events/" + id).collect(Collectors.toList())),
+                "unique", Boolean.FALSE
+        );
+        ResponseEntity<Object> response = get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
+
+        return response.hasBody() ? mapper.convertValue(response.getBody(), mapType).stream()
+                .collect(Collectors.toMap(
+                        this::getEventIdFromURI, ViewStats::getHits))
+                : Collections.emptyMap();
+    }
+
+    private Long getEventIdFromURI(ViewStats e) {
+        return Long.parseLong(e.getUri().substring(e.getUri().lastIndexOf("/") + 1));
+    }
+
+    private String toString(List<String> strings) {
+        return Arrays.toString(strings.toArray()).replace("[", "").replace("]", "");
+    }
 
 }

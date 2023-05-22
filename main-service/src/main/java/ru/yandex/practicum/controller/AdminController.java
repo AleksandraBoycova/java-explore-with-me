@@ -5,10 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.category.CategoryDto;
+import ru.practicum.compilation.CompilationDto;
+import ru.practicum.compilation.NewCompilationDto;
+import ru.practicum.compilation.UpdateCompilationRequest;
 import ru.practicum.event.EventDto;
 import ru.practicum.event.UpdateEventRequest;
 import ru.practicum.user.UserDto;
 import ru.yandex.practicum.service.CategoriesService;
+import ru.yandex.practicum.service.CompilationService;
 import ru.yandex.practicum.service.EventService;
 import ru.yandex.practicum.service.UserService;
 
@@ -23,6 +27,7 @@ import java.util.List;
 public class AdminController {
 
     private final CategoriesService categoriesService;
+    private final CompilationService compilationService;
     private final EventService eventService;
     private final UserService userService;
 
@@ -75,7 +80,8 @@ public class AdminController {
 
 
     @GetMapping("/users")
-    public List<UserDto> getUsers(@RequestParam(name = "ids") List<Long> userIds, @RequestParam(name = "from", defaultValue = "0")
+    public List<UserDto> getUsers(@RequestParam(name = "ids", required = false) List<Long> userIds,
+                                  @RequestParam(name = "from", defaultValue = "0")
     Integer from, @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Admin: Вызван метод getUsers {}, size {}, from {}", userIds, from, size);
         return userService.getUsers(userIds, from, size);
@@ -88,4 +94,29 @@ public class AdminController {
         log.info("Admin: Вызван метод deleteUser " + userId);
         userService.deleteUser(userId);
     }
+
+
+    @PostMapping("/compilations")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CompilationDto addCompilation(@Valid @RequestBody NewCompilationDto compilation) {
+        log.info("Admin: Вызван метод addCompilation ");
+        return compilationService.addCompilation(compilation);
+    }
+
+
+    @DeleteMapping("/compilations/{compId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCompilation(@PathVariable Long compId) {
+        log.info("Admin: Вызван метод deleteCompilation " + compId);
+        compilationService.deleteCompilation(compId);
+    }
+
+
+    @PatchMapping("/compilations/{compId}")
+    public CompilationDto updateCompilation(@PathVariable Long compId, @RequestBody UpdateCompilationRequest compil) {
+        log.info("Admin: Вызван метод updateCompilation " + compId);
+        return compilationService.updateCompilation(compId, compil);
+    }
+
+
 }

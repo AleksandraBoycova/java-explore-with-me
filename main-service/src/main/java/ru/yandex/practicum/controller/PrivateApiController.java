@@ -54,33 +54,33 @@ public class PrivateApiController {
         return eventService.updateEventByUser(userId, eventId, event);
     }
 
-    @GetMapping("users/{userId}/events/{eventId}/requests")
+    @GetMapping("{userId}/events/{eventId}/requests")
     public List<ParticipationRequestDto> getUserRequestsInEvent(@PathVariable Long userId, @PathVariable Long eventId) {
         log.info("Private: Вызван метод getUserRequestsInEvent, userId eventId {} {}", userId, eventId);
         return requestService.getUserRequestsInEvent(userId, eventId);
     }
 
-    @PatchMapping("users/{userId}/events/{eventId}/requests")
+    @PatchMapping("{userId}/events/{eventId}/requests")
     public EventRequestStatusUpdateResult confirmOrRejectRequestsByUser(@PathVariable Long userId, @PathVariable
     Long eventId, @Valid @RequestBody EventRequestStatusUpdateRequest request) {
         log.info("Private: Вызван метод confirmOrRejectRequestsByUser, userId eventId {} {}", userId, eventId);
         return requestService.confirmOrRejectRequestsByUser(userId, eventId, request);
     }
 
-    @GetMapping("users/{userId}/requests")
+    @GetMapping("{userId}/requests")
     List<ParticipationRequestDto> getUserRequestsInForeignEvents(@PathVariable Long userId) {
         log.info("Private: Вызван метод getUserRequestsInForeignEvents, userId {}", userId);
         return requestService.getUserRequestsInForeignEvents(userId);
     }
 
-    @PostMapping("users/{userId}/requests")
+    @PostMapping("{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto addRequest(@PathVariable Long userId, @RequestParam(name = "eventId") Long eventId) {
         log.info("Private: Вызван метод addRequest, userId {}", userId);
         return requestService.addRequest(userId, eventId);
     }
 
-    @PatchMapping("/users/{userId}/requests/{requestId}/cancel")
+    @PatchMapping("{userId}/requests/{requestId}/cancel")
     public ParticipationRequestDto cancelRequestByUser(@PathVariable Long userId, @PathVariable Long requestId) {
         log.info("Private: Вызван метод cancelRequestByUser, userId requestId {} {}", userId, requestId);
         return requestService.cancelRequestByUser(userId, requestId);

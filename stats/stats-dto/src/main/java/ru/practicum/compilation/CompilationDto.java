@@ -1,6 +1,9 @@
 package ru.practicum.compilation;
 
 import lombok.Data;
+import ru.practicum.event.EventDto;
+
+import java.util.Set;
 
 @Data
 public class CompilationDto {
@@ -9,5 +12,7 @@ public class CompilationDto {
 
     private Boolean pinned;
 
-    private String title;
+    private String        title;
+
+    private Set<EventDto> events;
 }

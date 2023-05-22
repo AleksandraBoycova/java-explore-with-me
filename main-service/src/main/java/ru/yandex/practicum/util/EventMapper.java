@@ -13,7 +13,7 @@ public class EventMapper {
         eventDto.setCategory(CategoryMapper.toDto(eventEntity.getCategory()));
         eventDto.setConfirmedRequests(eventEntity.getConfirmedRequests());
         eventDto.setDescription(eventEntity.getDescription());
-        eventDto.setInitiator(UserMapper.toDto(eventEntity.getInitiator()));
+        eventDto.setInitiator(UserMapper.toShortDto(eventEntity.getInitiator()));
         eventDto.setEventDate(eventEntity.getEventDate());
         eventDto.setPaid(eventEntity.getPaid());
         eventDto.setTitle(eventEntity.getTitle());
@@ -49,7 +49,7 @@ public class EventMapper {
         eventDto.setCategory(CategoryMapper.toDto(eventEntity.getCategory()));
         eventDto.setConfirmedRequests(eventEntity.getConfirmedRequests());
         eventDto.setEventDate(eventEntity.getEventDate());
-        eventDto.setInitiator(UserMapper.toDto(eventEntity.getInitiator()));
+        eventDto.setInitiator(UserMapper.toShortDto(eventEntity.getInitiator()));
         eventDto.setPaid(eventEntity.getPaid());
         eventDto.setTitle(eventEntity.getTitle());
         eventDto.setViews(eventEntity.getViews());

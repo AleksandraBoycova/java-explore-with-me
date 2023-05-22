@@ -16,6 +16,7 @@ import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.exception.RequestDeniedException;
 import ru.yandex.practicum.model.CategoryEntity;
 import ru.yandex.practicum.model.EventEntity;
+import ru.yandex.practicum.model.LocationEntity;
 import ru.yandex.practicum.model.UserEntity;
 import ru.yandex.practicum.repository.CategoryRepository;
 import ru.yandex.practicum.repository.EventRepository;
@@ -28,6 +29,7 @@ import ru.yandex.practicum.util.EventsSortedBy;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static ru.practicum.stat.Constants.dateTimeFormatter;
@@ -38,11 +40,11 @@ import static ru.practicum.stat.Constants.dateTimeFormatter;
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
-    private final EventRepository eventRepository;
+    private final EventRepository    eventRepository;
     private final LocationRepository locationRepository;
     private final CategoryRepository categoryRepository;
-    private final UserRepository userRepository;
-    private final StateClient stateClient;
+    private final UserRepository     userRepository;
+    private final StateClient        stateClient;
 
     @Override
     public List<EventDto> getEvents(String text, List<Long> categoriesIds, Boolean paid, String rangeStart,
@@ -50,35 +52,46 @@ public class EventServiceImpl implements EventService {
                                     Integer size, HttpServletRequest request) {
 
         LocalDateTime start = null;
-        LocalDateTime end;
+        LocalDateTime end   = null;
 
-        if (rangeStart == null) {
-            start = LocalDateTime.now();
-        }
-        if (rangeEnd == null) {
-            end = LocalDateTime.now();
-        } else {
+        if (rangeStart != null && rangeEnd != null) {
             start = LocalDateTime.parse(rangeStart, dateTimeFormatter);
             end = LocalDateTime.parse(rangeEnd, dateTimeFormatter);
-        }
-        if (text != null) {
-            text = text.toLowerCase();
+        } else {
+            if (rangeStart == null && rangeEnd == null) {
+                start = LocalDateTime.now();
+                end = LocalDateTime.now().plusYears(10);
+            } else {
+                if (rangeStart == null) {
+                    start = LocalDateTime.now();
+                }
+                if (rangeEnd == null) {
+                    end = LocalDateTime.now();
+                }
+            }
         }
 
-        final PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by(EventsSortedBy.EVENT_DATE.equals(sortedBy) ? "start" : "view"));
-        List<EventEntity> eventEntities = eventRepository.searchPublishedEvents(text, categoriesIds, paid, start, end,
+        final PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by(EventsSortedBy.EVENT_DATE.equals(sortedBy) ? "eventDate" : "views"));
+        List<EventEntity> eventEntities = eventRepository.searchPublishedEvents(categoriesIds, paid, start, end,
                 pageRequest).getContent();
 
         if (eventEntities.isEmpty()) {
             return Collections.emptyList();
         }
+        Predicate<EventEntity> eventEntityPredicate;
+        if(text != null && !text.isEmpty()){
+            eventEntityPredicate = eventEntity -> eventEntity.getAnnotation().toLowerCase().contains(text.toLowerCase())
+                    || eventEntity.getDescription().toLowerCase().contains(text.toLowerCase());
+        }else{
+            eventEntityPredicate = eventEntity -> true;
+        }
 
-        Set<Long> eventIds = eventEntities.stream().map(EventEntity::getId).collect(Collectors.toSet());
-//        Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
+        Set<Long> eventIds = eventEntities.stream().filter(eventEntityPredicate).map(EventEntity::getId).collect(Collectors.toSet());
+        Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
 
         List<EventDto> events = eventEntities.stream().map(EventMapper::toPublicApiDto).collect(Collectors.toList());
-//        events.forEach(eventFullDto ->
-//                eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
+        events.forEach(eventFullDto ->
+                eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
         return events;
     }
 
@@ -137,7 +150,7 @@ public class EventServiceImpl implements EventService {
     public List<EventDto> searchEvents(List<Long> userIds, List<String> states, List<Long> categories,
                                        String rangeStart, String rangeEnd, Integer from, Integer size, HttpServletRequest
                                                request) {
-        int page = from / size;
+        int               page        = from / size;
         final PageRequest pageRequest = PageRequest.of(page, size);
         if (states == null & rangeStart == null & rangeEnd == null) {
             return eventRepository.findAll().stream().map(EventMapper::toPublicApiDto).collect(Collectors.toList());
@@ -204,7 +217,7 @@ public class EventServiceImpl implements EventService {
             throw new NotFoundException("Такого пользователя нет");
         }
         Page<EventEntity> eventsWithPage = eventRepository.findAllByUserWithPage(userId, PageRequest.of(from / size, size));
-        List<EventEntity> events = eventsWithPage.getContent();
+        List<EventEntity> events         = eventsWithPage.getContent();
         return events.stream().map(EventMapper::toShortDto).collect(Collectors.toList());
     }
 
@@ -218,10 +231,10 @@ public class EventServiceImpl implements EventService {
                 throw new RequestDeniedException("Дата и время на которые намечено событие не может быть раньше, " +
                         "чем через два часа от текущего момента ");
             }
-            if (event.getStateAction().equals("SEND_TO_REVIEW")) {
+            if ("SEND_TO_REVIEW".equals(event.getStateAction())) {
                 eventFromDb.setState(State.PENDING);
             }
-            if (event.getStateAction().equals("CANCEL_REVIEW")) {
+            if ("CANCEL_REVIEW".equals(event.getStateAction())) {
                 eventFromDb.setState(State.CANCELED);
             }
         } else {
@@ -250,7 +263,7 @@ public class EventServiceImpl implements EventService {
         eventToUpdate.setLocation(event.getLocation() == null
                 ? eventToUpdate.getLocation()
                 : locationRepository.findByLatAndLon(event.getLocation().getLat(), event.getLocation().getLon())
-                .orElseThrow(() -> new NotFoundException("Location not found")));
+                .orElse(new LocationEntity(null, event.getLocation().getLat(), event.getLocation().getLon())));
         eventToUpdate.setPaid(Objects.requireNonNullElse(event.getPaid(), eventToUpdate.getPaid()));
         eventToUpdate.setParticipantLimit(Objects.requireNonNullElse(event.getParticipantLimit(), eventToUpdate.getParticipantLimit()));
         eventToUpdate.setRequestModeration(Objects.requireNonNullElse(event.getRequestModeration(), eventToUpdate.getRequestModeration()));

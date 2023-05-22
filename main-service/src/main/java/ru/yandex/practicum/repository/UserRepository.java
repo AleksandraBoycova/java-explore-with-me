@@ -2,6 +2,7 @@ package ru.yandex.practicum.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,5 +26,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             "WHERE u.id IN :userIds " +
             "ORDER BY u.id " +
             "DESC")
-    Page<UserEntity> findAllByUserIdIn(PageRequest pageRequest, @Param("userIds") List<Long> userIds);
+    Page<UserEntity> findAllByUserIdIn(Pageable pageable, @Param("userIds") List<Long> userIds);
 }
