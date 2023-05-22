@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.yandex.practicum.exception.AlreadyExistsException;
+import ru.yandex.practicum.exception.ErrorResponse;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.exception.RequestDeniedException;
-import ru.yandex.practicum.exception.ErrorResponse;
 
 import javax.validation.ConstraintViolationException;
 import java.util.Date;

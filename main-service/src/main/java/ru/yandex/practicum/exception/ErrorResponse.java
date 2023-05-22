@@ -9,8 +9,8 @@ import java.util.Date;
 @Value
 public
 class ErrorResponse {
-    Date   timestamp;
-    int    status;
+    Date timestamp;
+    int status;
     String error;
     String path;
 }
