@@ -9,15 +9,19 @@ public class EventMapper {
     public static EventDto toPublicApiDto(EventEntity eventEntity) {
         EventDto eventDto = new EventDto();
         eventDto.setId(eventEntity.getId());
+        eventDto.setTitle(eventEntity.getTitle());
         eventDto.setAnnotation(eventEntity.getAnnotation());
         eventDto.setCategory(CategoryMapper.toDto(eventEntity.getCategory()));
-        eventDto.setConfirmedRequests(eventEntity.getConfirmedRequests());
-        eventDto.setDescription(eventEntity.getDescription());
-        eventDto.setInitiator(UserMapper.toShortDto(eventEntity.getInitiator()));
-        eventDto.setEventDate(eventEntity.getEventDate());
         eventDto.setPaid(eventEntity.getPaid());
-        eventDto.setTitle(eventEntity.getTitle());
-        eventDto.setViews(eventEntity.getViews());
+        eventDto.setEventDate(eventEntity.getEventDate());
+        eventDto.setInitiator(UserMapper.toShortDto(eventEntity.getInitiator()));
+        eventDto.setDescription(eventEntity.getDescription());
+        eventDto.setParticipantLimit(eventEntity.getParticipantLimit());
+        eventDto.setState(eventEntity.getState());
+        eventDto.setCreatedOn(eventEntity.getCreatedOn());
+        eventDto.setPublishedOn(eventEntity.getPublishedOn());
+        eventDto.setLocation(LocationMapper.toDto(eventEntity.getLocation()));
+        eventDto.setRequestModeration(eventEntity.getRequestModeration());
         return eventDto;
     }
 

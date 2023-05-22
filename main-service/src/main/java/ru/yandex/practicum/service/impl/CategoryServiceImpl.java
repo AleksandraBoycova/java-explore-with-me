@@ -70,6 +70,9 @@ public class CategoryServiceImpl implements CategoriesService {
     @Transactional
     @Override
     public CategoryDto update(CategoryDto category, Long catId) {
+        if (category.getName() == null || category.getName().isEmpty()) {
+            throw new RuntimeException("Название категории не может быть пустым");
+        }
         CategoryEntity savedCategory = categoryRepository.findById(catId).orElseThrow(() ->
                 new NotFoundException("Такой категории нет " + catId));
         if (categoryRepository.existsByName(category.getName())) {
