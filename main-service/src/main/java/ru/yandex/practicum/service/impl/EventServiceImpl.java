@@ -89,7 +89,7 @@ public class EventServiceImpl implements EventService {
         Set<Long> eventIds = eventEntities.stream().filter(eventEntityPredicate).map(EventEntity::getId).collect(Collectors.toSet());
         Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
 
-        List<EventDto> events = eventEntities.stream().map(EventMapper::toPublicApiDto).collect(Collectors.toList());
+        List<EventDto> events = eventEntities.stream().map(EventMapper::toShortDto).collect(Collectors.toList());
         events.forEach(eventFullDto ->
                 eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
         return events;
@@ -106,7 +106,7 @@ public class EventServiceImpl implements EventService {
 
         Long views = stateClient.getStatisticsByEventId(eventId);
 
-        EventDto eventDto = EventMapper.toPublicApiDto(event);
+        EventDto eventDto = EventMapper.toFullDto(event);
         eventDto.setViews(views);
 
         stateClient.saveHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
@@ -153,7 +153,7 @@ public class EventServiceImpl implements EventService {
         int page = from / size;
         final PageRequest pageRequest = PageRequest.of(page, size);
         if (states == null & rangeStart == null & rangeEnd == null) {
-            return eventRepository.findAll().stream().map(EventMapper::toPublicApiDto).collect(Collectors.toList());
+            return eventRepository.findAll().stream().map(EventMapper::toFullDto).collect(Collectors.toList());
         }
 
         List<State> stateList = states.stream().map(State::valueOf).collect(Collectors.toList());
@@ -175,11 +175,24 @@ public class EventServiceImpl implements EventService {
         if (userIds.size() != 0 && states.size() != 0 && categories.size() != 0) {
             Page<EventEntity> eventsWithPage = eventRepository.findAllWithAllParameters(userIds, stateList, categories, start, end,
                     pageRequest);
-            return eventsWithPage.getContent().stream().map(EventMapper::toPublicApiDto).collect(Collectors.toList());
+            Set<Long> eventIds = eventsWithPage.stream().map(EventEntity::getId).collect(Collectors.toSet());
+            Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
+
+            List<EventDto> events = eventsWithPage.stream().map(EventMapper::toFullDto).collect(Collectors.toList());
+            events.forEach(eventFullDto ->
+                    eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
+            return events;
         }
         if (userIds.size() == 0 && categories.size() != 0) {
-            Page<EventEntity> eventsWithPage = eventRepository.findAllEventsWithoutIdList(categories, stateList, start, end, pageRequest);
-            return eventsWithPage.getContent().stream().map(EventMapper::toPublicApiDto).collect(Collectors.toList());
+            Page<EventEntity> eventsWithPage = eventRepository.findAllWithAllParameters(userIds, stateList, categories, start, end,
+                    pageRequest);
+            Set<Long> eventIds = eventsWithPage.stream().map(EventEntity::getId).collect(Collectors.toSet());
+            Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
+
+            List<EventDto> events = eventsWithPage.stream().map(EventMapper::toFullDto).collect(Collectors.toList());
+            events.forEach(eventFullDto ->
+                    eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
+            return events;
         } else {
             return new ArrayList<>();
         }
