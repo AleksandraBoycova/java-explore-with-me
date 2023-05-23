@@ -22,6 +22,7 @@ import ru.yandex.practicum.util.ParticipationRequestMapper;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,7 +43,10 @@ public class ParticipationRequestsServiceImpl implements RequestService {
         EventEntity event = eventsRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Такого события нет "
                 + eventId));
         ParticipationRequestEntity request = new ParticipationRequestEntity(LocalDateTime.now(), event, requester, State.PENDING);
-        List<ParticipationRequestEntity> requests = participationRequestsRepository.findAllByRequesterIdAndEventId(userId, eventId);
+        Optional<ParticipationRequestEntity> requests = participationRequestsRepository.findByRequesterIdAndEventId(userId, eventId);
+        if (requests.isPresent()) {
+            throw new RequestDeniedException("Нельзя добавить повторный запрос: userId {}, eventId {} " + userId + eventId);
+        }
         if (event.getInitiator().getId().equals(userId)) {
             throw new RequestDeniedException("Инициатор события не может добавить запрос на участие в своём событии " + userId);
         }
@@ -54,20 +58,16 @@ public class ParticipationRequestsServiceImpl implements RequestService {
             if (limit == event.getConfirmedRequests()) {
                 throw new RequestDeniedException("У события достигнут лимит запросов на участие: " + limit);
             }
+        } else {
+            request.setState(State.CONFIRMED);
         }
 
-        if (requests.isEmpty()) {
-            if (!event.getRequestModeration()) {
-                request.setState(State.CONFIRMED);
-                event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-            } else {
-                request.setState(State.PENDING);
-            }
-            ParticipationRequestEntity savedRequest = participationRequestsRepository.save(request);
-            return ParticipationRequestMapper.toDto(savedRequest);
-        } else {
-            throw new AlreadyExistsException("Нельзя добавить повторный запрос: userId {}, eventId {} " + userId + eventId);
+        if (!event.getRequestModeration()) {
+            request.setState(State.CONFIRMED);
+            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
         }
+        ParticipationRequestEntity savedRequest = participationRequestsRepository.save(request);
+        return ParticipationRequestMapper.toDto(savedRequest);
     }
 
 

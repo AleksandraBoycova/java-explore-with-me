@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import ru.practicum.exception.ErrorResponse;
 import ru.yandex.practicum.exception.AlreadyExistsException;
-import ru.yandex.practicum.exception.ErrorResponse;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.exception.RequestDeniedException;
 
@@ -35,12 +35,12 @@ public class ControllerExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRequestDeniedException(RequestDeniedException e) {
         ErrorResponse errorResponse = new ErrorResponse(
                 new Date(),
-                HttpStatus.CONFLICT.value(),
-                HttpStatus.CONFLICT.getReasonPhrase(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 e.getMessage()
         );
         log.warn(e.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
@@ -71,12 +71,12 @@ public class ControllerExceptionHandler {
     public ResponseEntity<ErrorResponse> handleConstraintException(ConstraintViolationException e) {
         ErrorResponse errorResponse = new ErrorResponse(
                 new Date(),
-                HttpStatus.CONFLICT.value(),
-                HttpStatus.CONFLICT.getReasonPhrase(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 e.getMessage()
         );
         log.warn(e.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
