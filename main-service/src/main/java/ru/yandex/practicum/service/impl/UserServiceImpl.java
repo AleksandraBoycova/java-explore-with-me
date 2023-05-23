@@ -3,6 +3,7 @@ package ru.yandex.practicum.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.user.UserDto;
@@ -13,6 +14,7 @@ import ru.yandex.practicum.repository.UserRepository;
 import ru.yandex.practicum.service.UserService;
 import ru.yandex.practicum.util.UserMapper;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,11 +37,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getUsers(List<Long> userIds, Integer from, Integer size) {
-        if (size != 0) {
-            return getUsersWithPage(userIds, from, size);
-        }
-        List<UserEntity> users = userRepository.findAllByUserIdIn(userIds);
-        return users.stream().map(UserMapper::toDto).collect(Collectors.toList());
+        PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("id").ascending());
+        List<UserEntity> users = userRepository.findAllByUserIdIn(pageRequest, userIds).getContent();
+        return users.stream().map(UserMapper::toDto).sorted(Comparator.comparing(UserDto::getId)).collect(Collectors.toList());
     }
 
     @Override

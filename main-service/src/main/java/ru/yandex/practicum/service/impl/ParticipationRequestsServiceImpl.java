@@ -9,7 +9,6 @@ import ru.practicum.request.EventRequestStatusUpdateResult;
 import ru.practicum.request.ParticipationRequestDto;
 import ru.yandex.practicum.exception.AlreadyExistsException;
 import ru.yandex.practicum.exception.NotFoundException;
-import ru.yandex.practicum.exception.RequestDeniedException;
 import ru.yandex.practicum.model.EventEntity;
 import ru.yandex.practicum.model.ParticipationRequestEntity;
 import ru.yandex.practicum.model.UserEntity;
@@ -45,18 +44,18 @@ public class ParticipationRequestsServiceImpl implements RequestService {
         ParticipationRequestEntity request = new ParticipationRequestEntity(LocalDateTime.now(), event, requester, State.PENDING);
         Optional<ParticipationRequestEntity> requests = participationRequestsRepository.findByRequesterIdAndEventId(userId, eventId);
         if (requests.isPresent()) {
-            throw new RequestDeniedException("Нельзя добавить повторный запрос: userId {}, eventId {} " + userId + eventId);
+            throw new AlreadyExistsException("Нельзя добавить повторный запрос: userId {}, eventId {} " + userId + eventId);
         }
         if (event.getInitiator().getId().equals(userId)) {
-            throw new RequestDeniedException("Инициатор события не может добавить запрос на участие в своём событии " + userId);
+            throw new AlreadyExistsException("Инициатор события не может добавить запрос на участие в своём событии " + userId);
         }
         if (!(event.getState().equals(State.PUBLISHED))) {
-            throw new RequestDeniedException("Нельзя участвовать в неопубликованном событии");
+            throw new AlreadyExistsException("Нельзя участвовать в неопубликованном событии");
         }
         int limit = event.getParticipantLimit();
         if (limit != 0) {
             if (limit == event.getConfirmedRequests()) {
-                throw new RequestDeniedException("У события достигнут лимит запросов на участие: " + limit);
+                throw new AlreadyExistsException("У события достигнут лимит запросов на участие: " + limit);
             }
         } else {
             request.setState(State.CONFIRMED);
@@ -120,7 +119,7 @@ public class ParticipationRequestsServiceImpl implements RequestService {
             throw new AlreadyExistsException("Подтверждение заявки не требуется " + eventId);
         }
         if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
-            throw new RequestDeniedException("Превышен лимит подтвержденных заявок " + eventId);
+            throw new AlreadyExistsException("Превышен лимит подтвержденных заявок " + eventId);
         }
 
         List<Long> requestIds = request.getRequestIds();

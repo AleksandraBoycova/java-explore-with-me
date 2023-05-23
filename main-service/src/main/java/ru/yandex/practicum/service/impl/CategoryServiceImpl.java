@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.practicum.category.CategoryDto;
 import ru.yandex.practicum.exception.AlreadyExistsException;
 import ru.yandex.practicum.exception.NotFoundException;
-import ru.yandex.practicum.exception.RequestDeniedException;
 import ru.yandex.practicum.model.CategoryEntity;
 import ru.yandex.practicum.model.EventEntity;
 import ru.yandex.practicum.repository.CategoryRepository;
@@ -58,8 +57,8 @@ public class CategoryServiceImpl implements CategoriesService {
     @Override
     public void deleteCategory(Long catId) {
         Optional<List<EventEntity>> eventsWithSameCat = eventRepository.findAllByCategoryId(catId);
-        if (eventsWithSameCat.get().size() != 0) {
-            throw new RequestDeniedException("Нельзя удалить категорию, если с ней связаны события " + catId);
+        if (eventsWithSameCat.isPresent() && eventsWithSameCat.get().size() != 0) {
+            throw new AlreadyExistsException("Нельзя удалить категорию, если с ней связаны события " + catId);
         }
         if (!categoryRepository.existsById(catId)) {
             throw new NotFoundException("Такой категории нет " + catId);
@@ -75,7 +74,7 @@ public class CategoryServiceImpl implements CategoriesService {
         }
         CategoryEntity savedCategory = categoryRepository.findById(catId).orElseThrow(() ->
                 new NotFoundException("Такой категории нет " + catId));
-        if (categoryRepository.existsByName(category.getName())) {
+        if (!savedCategory.getName().equals(category.getName()) && categoryRepository.existsByName(category.getName())) {
             throw new AlreadyExistsException("Категория с таким именем уже существует: " + category.getName());
         } else {
             savedCategory.setName(category.getName());

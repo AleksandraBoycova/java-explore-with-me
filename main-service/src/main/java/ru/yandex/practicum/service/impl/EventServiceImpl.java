@@ -12,6 +12,7 @@ import ru.practicum.event.EventDto;
 import ru.practicum.event.NewEventDto;
 import ru.practicum.event.State;
 import ru.practicum.event.UpdateEventRequest;
+import ru.yandex.practicum.exception.AlreadyExistsException;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.exception.RequestDeniedException;
 import ru.yandex.practicum.model.CategoryEntity;
@@ -128,13 +129,13 @@ public class EventServiceImpl implements EventService {
                     eventToUpdate.setState(State.PUBLISHED);
                     eventToUpdate.setPublishedOn(LocalDateTime.now());
                 } else {
-                    throw new RequestDeniedException("Событие можно публиковать, только если оно в состоянии ожидания публикации" +
+                    throw new AlreadyExistsException("Событие можно публиковать, только если оно в состоянии ожидания публикации" +
                             event.getStateAction());
                 }
             }
             if (event.getStateAction().equals("REJECT_EVENT")) {
                 if (eventToUpdate.getState().equals(State.PUBLISHED)) {
-                    throw new RequestDeniedException("Событие можно отклонить, только если оно еще не опубликовано" +
+                    throw new AlreadyExistsException("Событие можно отклонить, только если оно еще не опубликовано " +
                             event.getStateAction());
                 }
                 eventToUpdate.setState(State.CANCELED);
@@ -153,7 +154,7 @@ public class EventServiceImpl implements EventService {
         int page = from / size;
         final PageRequest pageRequest = PageRequest.of(page, size);
         if (states == null & rangeStart == null & rangeEnd == null) {
-            return eventRepository.findAll().stream().map(EventMapper::toFullDto).collect(Collectors.toList());
+            return eventRepository.findAll(pageRequest).stream().map(EventMapper::toFullDto).collect(Collectors.toList());
         }
 
         List<State> stateList = states.stream().map(State::valueOf).collect(Collectors.toList());
@@ -251,7 +252,7 @@ public class EventServiceImpl implements EventService {
                 eventFromDb.setState(State.CANCELED);
             }
         } else {
-            throw new RequestDeniedException("Изменить можно только отмененные события или события в состоянии ожидания модерации, " +
+            throw new AlreadyExistsException("Изменить можно только отмененные события или события в состоянии ожидания модерации, " +
                     "статус события = " + eventFromDb.getState());
         }
 

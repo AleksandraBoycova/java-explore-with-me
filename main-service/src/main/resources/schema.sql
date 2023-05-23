@@ -11,11 +11,11 @@ CREATE TABLE IF NOT EXISTS users
     email
     VARCHAR
 (
-    128
+    255
 ) UNIQUE NOT NULL,
     name VARCHAR
 (
-    128
+    250
 )
     );
 
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS categories
     name
     VARCHAR
 (
-    128
+    50
 ) UNIQUE NOT NULL
     );
 
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS compilations
     title
     VARCHAR
 (
-    121
+    50
 ) NOT NULL,
     pinned BOOLEAN
     );
