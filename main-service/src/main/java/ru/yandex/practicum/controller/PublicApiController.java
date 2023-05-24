@@ -39,7 +39,6 @@ public class PublicApiController {
         return categoriesService.getCategoryById(catId);
     }
 
-
     @GetMapping("events")
     public List<EventDto> getEventsFiltered(@RequestParam(name = "text", required = false) String text,
                                             @RequestParam(name = "categories", required = false) List<Long> categoriesIds,
@@ -57,13 +56,11 @@ public class PublicApiController {
         return result;
     }
 
-
     @GetMapping("events/{id}")
     public EventDto getFullEventById(@PathVariable Long id, HttpServletRequest request) {
         log.info("Public API: Вызван метод getCategoryById, id {}", id);
         return eventService.getEventById(id, request);
     }
-
 
     @GetMapping("compilations/{compId}")
     public CompilationDto getCompilationById(@PathVariable Long compId) {
