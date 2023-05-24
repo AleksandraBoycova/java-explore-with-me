@@ -24,9 +24,7 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public void saveHit(EndpointHit endpointHit) {
-        if (!repository.existsByIpAndUri(endpointHit.getIp(), endpointHit.getUri())) {
             repository.save(HitMapper.toEntity(endpointHit));
-        }
     }
 
 
