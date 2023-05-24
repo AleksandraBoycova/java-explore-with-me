@@ -70,7 +70,7 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest compilation) {
         CompilationEntity compilationFromDb = compilationRepository.findById(compId).orElseThrow(() ->
                 new NotFoundException("Такой подборки нет " + compId));
-        if (compilation.getEvents().size() != 0) {
+        if (compilation.getEvents() != null && !compilation.getEvents().isEmpty()) {
             Set<Long> eventIds = compilation.getEvents();
             Set<EventEntity> events = new HashSet<>(eventRepository.findAllByIdIn(eventIds));
             compilationFromDb.setEvents(events);

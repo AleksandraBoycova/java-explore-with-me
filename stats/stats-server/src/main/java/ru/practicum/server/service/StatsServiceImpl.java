@@ -42,12 +42,16 @@ public class StatsServiceImpl implements StatsService {
         }
         if (unique) {
             if (uris != null && !uris.isEmpty()) {
+                uris.replaceAll(s -> s.replace("[", ""));
+                uris.replaceAll(s -> s.replace("]", ""));
                 return repository.findAllByTimestampBetweenAndUriInUnique(startDate, endDate, uris);
             } else {
                 return repository.findAllByTimestampBetweenUnique(startDate, endDate);
             }
         } else {
             if (uris != null && !uris.isEmpty()) {
+                uris.replaceAll(s -> s.replace("[", ""));
+                uris.replaceAll(s -> s.replace("]", ""));
                 return repository.findAllByTimestampBetweenAndUriIn(startDate, endDate, uris);
             } else {
                 return repository.findAllByTimestampBetween(startDate, endDate);
