@@ -117,6 +117,4 @@ public class AdminController {
         log.info("Admin: Вызван метод updateCompilation " + compId);
         return compilationService.updateCompilation(compId, compil);
     }
-
-
 }
