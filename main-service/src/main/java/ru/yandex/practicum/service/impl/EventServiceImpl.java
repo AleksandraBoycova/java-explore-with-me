@@ -78,6 +78,9 @@ public class EventServiceImpl implements EventService {
         final PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by(EventsSortedBy.EVENT_DATE.equals(sortedBy) ? "eventDate" : "views"));
         List<EventEntity> eventEntities = eventRepository.searchPublishedEvents(categoriesIds, paid, start, end,
                 pageRequest).getContent();
+        log.info("client ip: {}", request.getRemoteAddr());
+        log.info("endpoint path: {}", request.getRequestURI());
+        stateClient.saveHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
 
         if (eventEntities.isEmpty()) {
             return Collections.emptyList();
