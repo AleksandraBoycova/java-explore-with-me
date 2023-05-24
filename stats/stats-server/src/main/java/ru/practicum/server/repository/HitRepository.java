@@ -48,5 +48,6 @@ public interface HitRepository extends JpaRepository<HitEntity, Long> {
     List<ViewStats> findAllByTimestampBetweenAndUriInUnique(@Param("start") LocalDateTime start,
                                                             @Param("end") LocalDateTime end,
                                                             @Param("uris") List<String> uris);
+    boolean existsByIpAndUri(String ip, String uri);
 
 }
