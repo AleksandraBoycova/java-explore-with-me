@@ -104,13 +104,14 @@ public class EventServiceImpl implements EventService {
 
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
+        stateClient.saveHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
 
         Long views = stateClient.getStatisticsByEventId(eventId);
 
         EventDto eventDto = EventMapper.toFullDto(event);
         eventDto.setViews(views);
 
-        stateClient.saveHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
+
         return eventDto;
 
     }
