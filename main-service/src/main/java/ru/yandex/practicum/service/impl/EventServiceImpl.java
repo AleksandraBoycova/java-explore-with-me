@@ -58,6 +58,9 @@ public class EventServiceImpl implements EventService {
         if (rangeStart != null && rangeEnd != null) {
             start = LocalDateTime.parse(rangeStart, dateTimeFormatter);
             end = LocalDateTime.parse(rangeEnd, dateTimeFormatter);
+            if (start.isAfter(end)) {
+                throw new RequestDeniedException("Wrong dates");
+            }
         } else {
             if (rangeStart == null && rangeEnd == null) {
                 start = LocalDateTime.now();
