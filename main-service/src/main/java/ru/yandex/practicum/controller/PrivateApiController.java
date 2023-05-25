@@ -28,7 +28,7 @@ public class PrivateApiController {
     @PostMapping("{userId}/events")
     @ResponseStatus(HttpStatus.CREATED)
     public EventDto createEvent(@PathVariable Long userId, @Valid @RequestBody NewEventDto event) {
-        log.info("Private: Вызван метод createEvent, userId {} ", userId);
+        log.debug("Private: Вызван метод createEvent, userId {} ", userId);
         return eventService.createEvent(userId, event);
     }
 
@@ -36,13 +36,13 @@ public class PrivateApiController {
     public List<EventDto> getEventsByUserWithPage(@PathVariable Long userId,
                                                   @RequestParam(name = "from", defaultValue = "0") Integer from,
                                                   @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        log.info("Private: Вызван метод getEventsByUserWithPage, userId, from, size {} {} {}", userId, from, size);
+        log.debug("Private: Вызван метод getEventsByUserWithPage, userId, from, size {} {} {}", userId, from, size);
         return eventService.getEventsByUserId(userId, from, size);
     }
 
     @GetMapping("{userId}/events/{eventId}")
     public EventDto getEventByUser(@PathVariable Long userId, @PathVariable Long eventId) {
-        log.info("Private: Вызван метод getEventByUser, userId, eventId {} {}", userId, eventId);
+        log.debug("Private: Вызван метод getEventByUser, userId, eventId {} {}", userId, eventId);
         return eventService.getEventByUserId(userId, eventId);
     }
 
@@ -50,39 +50,39 @@ public class PrivateApiController {
     public EventDto updateEventByUser(@PathVariable Long userId,
                                       @PathVariable Long eventId,
                                       @Valid @RequestBody UpdateEventRequest event) {
-        log.info("Private: Вызван метод updateEventByUser, userId eventId {} {}", userId, eventId);
+        log.debug("Private: Вызван метод updateEventByUser, userId eventId {} {}", userId, eventId);
         return eventService.updateEventByUser(userId, eventId, event);
     }
 
     @GetMapping("{userId}/events/{eventId}/requests")
     public List<ParticipationRequestDto> getUserRequestsInEvent(@PathVariable Long userId, @PathVariable Long eventId) {
-        log.info("Private: Вызван метод getUserRequestsInEvent, userId eventId {} {}", userId, eventId);
+        log.debug("Private: Вызван метод getUserRequestsInEvent, userId eventId {} {}", userId, eventId);
         return requestService.getUserRequestsInEvent(userId, eventId);
     }
 
     @PatchMapping("{userId}/events/{eventId}/requests")
     public EventRequestStatusUpdateResult confirmOrRejectRequestsByUser(@PathVariable Long userId, @PathVariable
     Long eventId, @Valid @RequestBody EventRequestStatusUpdateRequest request) {
-        log.info("Private: Вызван метод confirmOrRejectRequestsByUser, userId eventId {} {}", userId, eventId);
+        log.debug("Private: Вызван метод confirmOrRejectRequestsByUser, userId eventId {} {}", userId, eventId);
         return requestService.confirmOrRejectRequestsByUser(userId, eventId, request);
     }
 
     @GetMapping("{userId}/requests")
     List<ParticipationRequestDto> getUserRequestsInForeignEvents(@PathVariable Long userId) {
-        log.info("Private: Вызван метод getUserRequestsInForeignEvents, userId {}", userId);
+        log.debug("Private: Вызван метод getUserRequestsInForeignEvents, userId {}", userId);
         return requestService.getUserRequestsInForeignEvents(userId);
     }
 
     @PostMapping("{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto addRequest(@PathVariable Long userId, @RequestParam(name = "eventId") Long eventId) {
-        log.info("Private: Вызван метод addRequest, userId {}", userId);
+        log.debug("Private: Вызван метод addRequest, userId {}", userId);
         return requestService.addRequest(userId, eventId);
     }
 
     @PatchMapping("{userId}/requests/{requestId}/cancel")
     public ParticipationRequestDto cancelRequestByUser(@PathVariable Long userId, @PathVariable Long requestId) {
-        log.info("Private: Вызван метод cancelRequestByUser, userId requestId {} {}", userId, requestId);
+        log.debug("Private: Вызван метод cancelRequestByUser, userId requestId {} {}", userId, requestId);
         return requestService.cancelRequestByUser(userId, requestId);
     }
 }

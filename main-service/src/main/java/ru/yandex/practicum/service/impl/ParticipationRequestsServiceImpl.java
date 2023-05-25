@@ -33,6 +33,7 @@ public class ParticipationRequestsServiceImpl implements RequestService {
     private final EventRepository eventsRepository;
 
     private final ParticipationRequestsRepository participationRequestsRepository;
+    private final ParticipationRequestMapper participationRequestMapper = new ParticipationRequestMapper();
 
     @Transactional
     @Override
@@ -66,7 +67,7 @@ public class ParticipationRequestsServiceImpl implements RequestService {
             event.setConfirmedRequests(event.getConfirmedRequests() + 1);
         }
         ParticipationRequestEntity savedRequest = participationRequestsRepository.save(request);
-        return ParticipationRequestMapper.toDto(savedRequest);
+        return participationRequestMapper.toDto(savedRequest);
     }
 
 
@@ -76,7 +77,7 @@ public class ParticipationRequestsServiceImpl implements RequestService {
             throw new NotFoundException("Такого пользователя нет");
         }
         List<ParticipationRequestEntity> requests = participationRequestsRepository.findAllByRequesterIdInForeignEvents(userId);
-        return requests.stream().map(ParticipationRequestMapper::toDto).collect(Collectors.toList());
+        return requests.stream().map(participationRequestMapper::toDto).collect(Collectors.toList());
     }
 
 
@@ -89,7 +90,7 @@ public class ParticipationRequestsServiceImpl implements RequestService {
             throw new NotFoundException("Такого события нет");
         }
         List<ParticipationRequestEntity> requests = participationRequestsRepository.findAllUserRequestsInEvent(userId, eventId);
-        return requests.stream().map(ParticipationRequestMapper::toDto).collect(Collectors.toList());
+        return requests.stream().map(participationRequestMapper::toDto).collect(Collectors.toList());
     }
 
 
@@ -102,7 +103,7 @@ public class ParticipationRequestsServiceImpl implements RequestService {
         ParticipationRequestEntity request = participationRequestsRepository.findById(requestId).orElseThrow(() ->
                 new NotFoundException("Такой заявки нет " + requestId));
         request.setState(State.CANCELED);
-        return ParticipationRequestMapper.toDto(participationRequestsRepository.save(request));
+        return participationRequestMapper.toDto(participationRequestsRepository.save(request));
     }
 
 
@@ -157,9 +158,9 @@ public class ParticipationRequestsServiceImpl implements RequestService {
         participationRequestsRepository.saveAll(updatedRequests);
         eventsRepository.save(event);
 
-        List<ParticipationRequestDto> con = confirmedRequests.stream().map(ParticipationRequestMapper::toDto).collect(Collectors.toList());
-        List<ParticipationRequestDto> rej = rejectedRequests.stream().map(ParticipationRequestMapper::toDto).collect(Collectors.toList());
+        List<ParticipationRequestDto> con = confirmedRequests.stream().map(participationRequestMapper::toDto).collect(Collectors.toList());
+        List<ParticipationRequestDto> rej = rejectedRequests.stream().map(participationRequestMapper::toDto).collect(Collectors.toList());
 
-        return ParticipationRequestMapper.toUpdateResult(con, rej);
+        return participationRequestMapper.toUpdateResult(con, rej);
     }
 }

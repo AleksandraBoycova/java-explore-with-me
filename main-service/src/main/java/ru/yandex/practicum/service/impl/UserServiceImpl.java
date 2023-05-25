@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper = new UserMapper();
 
     @Transactional
     @Override
@@ -30,8 +31,8 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByName(user.getName())) {
             throw new AlreadyExistsException("Пользователь с таким именем уже существует: " + user.getName());
         }
-        UserEntity savedUser = userRepository.save(UserMapper.toEntity(user));
-        return UserMapper.toDto(savedUser);
+        UserEntity savedUser = userRepository.save(userMapper.toEntity(user));
+        return userMapper.toDto(savedUser);
     }
 
 
@@ -39,14 +40,14 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getUsers(List<Long> userIds, Integer from, Integer size) {
         PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("id").ascending());
         List<UserEntity> users = userRepository.findAllByUserIdIn(pageRequest, userIds).getContent();
-        return users.stream().map(UserMapper::toDto).sorted(Comparator.comparing(UserDto::getId)).collect(Collectors.toList());
+        return users.stream().map(userMapper::toDto).sorted(Comparator.comparing(UserDto::getId)).collect(Collectors.toList());
     }
 
     @Override
     public List<UserDto> getUsersWithPage(List<Long> userIds, Integer from, Integer size) {
         final PageRequest pageRequest = PageRequest.of(from / size, size);
         Page<UserEntity> users = userRepository.findAllByUserIdIn(pageRequest, userIds);
-        return users.stream().map(UserMapper::toDto).collect(Collectors.toList());
+        return users.stream().map(userMapper::toDto).collect(Collectors.toList());
     }
 
 

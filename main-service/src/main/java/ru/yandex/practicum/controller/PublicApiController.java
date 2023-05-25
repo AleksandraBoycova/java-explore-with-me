@@ -29,13 +29,13 @@ public class PublicApiController {
     @GetMapping("/categories")
     public List<CategoryDto> getCategories(@RequestParam(name = "from", defaultValue = "0") Integer from,
                                            @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        log.info("Public API: Вызван метод getCategories с параметрами from {}, size {}", from, size);
+        log.debug("Public API: Вызван метод getCategories с параметрами from {}, size {}", from, size);
         return categoriesService.getCategories(from, size);
     }
 
     @GetMapping("/categories/{catId}")
     public CategoryDto getCategoryById(@PathVariable Long catId) {
-        log.info("Public API: Вызван метод getCategoryById, catId {}", catId);
+        log.debug("Public API: Вызван метод getCategoryById, catId {}", catId);
         return categoriesService.getCategoryById(catId);
     }
 
@@ -49,22 +49,21 @@ public class PublicApiController {
                                             @RequestParam(name = "sort", required = false) EventsSortedBy sorted,
                                             @RequestParam(name = "from", defaultValue = "0") Integer from,
                                             @RequestParam(name = "size", defaultValue = "10") Integer size, HttpServletRequest request) {
-        log.info("Public API: Вызван метод getEventsFiltered");
-        List<EventDto> result = eventService.getEvents(text, categoriesIds, paid, rangeStart, rangeEnd,
-                onlyAvailable, sorted, from, size, request);
+        log.debug("Public API: Вызван метод getEventsFiltered");
 
-        return result;
+        return eventService.getEvents(text, categoriesIds, paid, rangeStart, rangeEnd,
+                onlyAvailable, sorted, from, size, request);
     }
 
     @GetMapping("events/{id}")
     public EventDto getFullEventById(@PathVariable Long id, HttpServletRequest request) {
-        log.info("Public API: Вызван метод getCategoryById, id {}", id);
+        log.debug("Public API: Вызван метод getCategoryById, id {}", id);
         return eventService.getEventById(id, request);
     }
 
     @GetMapping("compilations/{compId}")
     public CompilationDto getCompilationById(@PathVariable Long compId) {
-        log.info("Public API: Вызван метод getCompilationById for id {}", compId);
+        log.debug("Public API: Вызван метод getCompilationById for id {}", compId);
         return compilationService.getCompilationById(compId);
     }
 
@@ -73,7 +72,7 @@ public class PublicApiController {
     public List<CompilationDto> getCompilations(@RequestParam(name = "pinned", required = false) Boolean pinned,
                                                 @RequestParam(name = "from", defaultValue = "0") Integer from,
                                                 @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        log.info("Public API: Вызван метод getCompilations with parameters: pinned {} from {} size {} ", pinned, from, size);
+        log.debug("Public API: Вызван метод getCompilations with parameters: pinned {} from {} size {} ", pinned, from, size);
         return compilationService.getCompilations(pinned, from, size);
     }
 }

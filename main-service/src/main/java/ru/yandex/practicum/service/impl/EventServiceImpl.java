@@ -46,6 +46,7 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final StateClient stateClient;
+    private final EventMapper eventMapper = new EventMapper();
 
     @Override
     public List<EventDto> getEvents(String text, List<Long> categoriesIds, Boolean paid, String rangeStart,
@@ -96,7 +97,7 @@ public class EventServiceImpl implements EventService {
         Set<Long> eventIds = eventEntities.stream().filter(eventEntityPredicate).map(EventEntity::getId).collect(Collectors.toSet());
         Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
 
-        List<EventDto> events = eventEntities.stream().map(EventMapper::toShortDto).collect(Collectors.toList());
+        List<EventDto> events = eventEntities.stream().map(eventMapper::toShortDto).collect(Collectors.toList());
         events.forEach(eventFullDto ->
                 eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
         return events;
@@ -114,7 +115,7 @@ public class EventServiceImpl implements EventService {
 
         Long views = stateClient.getStatisticsByEventId(eventId);
 
-        EventDto eventDto = EventMapper.toFullDto(event);
+        EventDto eventDto = eventMapper.toFullDto(event);
         eventDto.setViews(views);
 
 
@@ -151,7 +152,7 @@ public class EventServiceImpl implements EventService {
         updateEventEntity(event, eventToUpdate);
 
         eventRepository.save(eventToUpdate);
-        return EventMapper.toPublicApiDto(eventToUpdate);
+        return eventMapper.toPublicApiDto(eventToUpdate);
     }
 
     @Override
@@ -161,7 +162,7 @@ public class EventServiceImpl implements EventService {
         int page = from / size;
         final PageRequest pageRequest = PageRequest.of(page, size);
         if (states == null & rangeStart == null & rangeEnd == null) {
-            return eventRepository.findAll(pageRequest).stream().map(EventMapper::toFullDto).collect(Collectors.toList());
+            return eventRepository.findAll(pageRequest).stream().map(eventMapper::toFullDto).collect(Collectors.toList());
         }
 
         List<State> stateList = states.stream().map(State::valueOf).collect(Collectors.toList());
@@ -181,29 +182,25 @@ public class EventServiceImpl implements EventService {
         }
 
         if (userIds.size() != 0 && states.size() != 0 && categories.size() != 0) {
-            Page<EventEntity> eventsWithPage = eventRepository.findAllWithAllParameters(userIds, stateList, categories, start, end,
-                    pageRequest);
-            Set<Long> eventIds = eventsWithPage.stream().map(EventEntity::getId).collect(Collectors.toSet());
-            Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
-
-            List<EventDto> events = eventsWithPage.stream().map(EventMapper::toFullDto).collect(Collectors.toList());
-            events.forEach(eventFullDto ->
-                    eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
-            return events;
+            return findEventDtosWithAllParameters(userIds, categories, pageRequest, stateList, start, end);
         }
         if (userIds.size() == 0 && categories.size() != 0) {
-            Page<EventEntity> eventsWithPage = eventRepository.findAllWithAllParameters(userIds, stateList, categories, start, end,
-                    pageRequest);
-            Set<Long> eventIds = eventsWithPage.stream().map(EventEntity::getId).collect(Collectors.toSet());
-            Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
-
-            List<EventDto> events = eventsWithPage.stream().map(EventMapper::toFullDto).collect(Collectors.toList());
-            events.forEach(eventFullDto ->
-                    eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
-            return events;
+            return findEventDtosWithAllParameters(userIds, categories, pageRequest, stateList, start, end);
         } else {
             return new ArrayList<>();
         }
+    }
+
+    private List<EventDto> findEventDtosWithAllParameters(List<Long> userIds, List<Long> categories, PageRequest pageRequest, List<State> stateList, LocalDateTime start, LocalDateTime end) {
+        Page<EventEntity> eventsWithPage = eventRepository.findAllWithAllParameters(userIds, stateList, categories, start, end,
+                pageRequest);
+        Set<Long> eventIds = eventsWithPage.stream().map(EventEntity::getId).collect(Collectors.toSet());
+        Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
+
+        List<EventDto> events = eventsWithPage.stream().map(eventMapper::toFullDto).collect(Collectors.toList());
+        events.forEach(eventFullDto ->
+                eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
+        return events;
     }
 
     @Transactional
@@ -211,7 +208,7 @@ public class EventServiceImpl implements EventService {
     public EventDto createEvent(Long userId, NewEventDto event) {
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя нет " + userId));
         validateTime(event.getEventDate());
-        EventEntity eventToSave = EventMapper.toEntity(event);
+        EventEntity eventToSave = eventMapper.toEntity(event);
         eventToSave.setState(State.PENDING);
         eventToSave.setConfirmedRequests(0L);
         eventToSave.setCreatedOn(LocalDateTime.now());
@@ -220,7 +217,7 @@ public class EventServiceImpl implements EventService {
         eventToSave.setCategory(category);
         eventToSave.setInitiator(user);
         EventEntity saved = eventRepository.save(eventToSave);
-        return EventMapper.toFullDto(saved);
+        return eventMapper.toFullDto(saved);
     }
 
     @Override
@@ -229,7 +226,7 @@ public class EventServiceImpl implements EventService {
             throw new NotFoundException("Такого пользователя нет");
         }
         EventEntity event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Такого события нет"));
-        return EventMapper.toFullDto(event);
+        return eventMapper.toFullDto(event);
     }
 
     @Override
@@ -239,7 +236,7 @@ public class EventServiceImpl implements EventService {
         }
         Page<EventEntity> eventsWithPage = eventRepository.findAllByUserWithPage(userId, PageRequest.of(from / size, size));
         List<EventEntity> events = eventsWithPage.getContent();
-        return events.stream().map(EventMapper::toShortDto).collect(Collectors.toList());
+        return events.stream().map(eventMapper::toShortDto).collect(Collectors.toList());
     }
 
     @Transactional
@@ -265,7 +262,7 @@ public class EventServiceImpl implements EventService {
 
         updateEventEntity(event, eventFromDb);
         eventRepository.save(eventFromDb);
-        return EventMapper.toFullDto(eventFromDb);
+        return eventMapper.toFullDto(eventFromDb);
     }
 
     private void validateTime(LocalDateTime start) {

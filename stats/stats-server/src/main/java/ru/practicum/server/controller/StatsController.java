@@ -30,7 +30,7 @@ public class StatsController {
                                          @RequestParam(name = "end") String end,
                                          @RequestParam(name = "uris", required = false) List<String> uris,
                                          @RequestParam(name = "unique", defaultValue = "false") Boolean unique) {
-        log.info("Stats: Вызван метод getStatistics с параметрами {}, {}, {}, {} :", start, end, uris, unique);
+        log.debug("Stats: Вызван метод getStatistics с параметрами {}, {}, {}, {} :", start, end, uris, unique);
         return service.getStatistics(start, end, uris, unique);
     }
 }

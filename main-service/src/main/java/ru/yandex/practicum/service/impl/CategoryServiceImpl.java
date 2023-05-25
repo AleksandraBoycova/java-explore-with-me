@@ -24,23 +24,24 @@ public class CategoryServiceImpl implements CategoriesService {
 
     private final CategoryRepository categoryRepository;
     private final EventRepository eventRepository;
+    private final CategoryMapper categoryMapper = new CategoryMapper();
 
     @Override
     public List<CategoryDto> getCategories(Integer from, Integer size) {
         if (size != 0) {
             final PageRequest pageRequest = PageRequest.of(from / size, size);
             List<CategoryEntity> categories = categoryRepository.findAll(pageRequest).getContent();
-            return categories.stream().map(CategoryMapper::toDto).collect(Collectors.toList());
+            return categories.stream().map(categoryMapper::toDto).collect(Collectors.toList());
         }
         List<CategoryEntity> categories = categoryRepository.findAll();
-        return categories.stream().map(CategoryMapper::toDto).collect(Collectors.toList());
+        return categories.stream().map(categoryMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
     public CategoryDto getCategoryById(Long catId) {
         CategoryEntity category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Такой категории нет " + catId));
-        return CategoryMapper.toDto(category);
+        return categoryMapper.toDto(category);
     }
 
     @Transactional
@@ -49,8 +50,8 @@ public class CategoryServiceImpl implements CategoriesService {
         if (categoryRepository.existsByName(category.getName())) {
             throw new AlreadyExistsException("Категория с таким именем уже существует: " + category.getName());
         }
-        CategoryEntity savedCategory = categoryRepository.save(CategoryMapper.toEntity(category));
-        return CategoryMapper.toDto(savedCategory);
+        CategoryEntity savedCategory = categoryRepository.save(categoryMapper.toEntity(category));
+        return categoryMapper.toDto(savedCategory);
     }
 
     @Transactional
@@ -78,7 +79,7 @@ public class CategoryServiceImpl implements CategoriesService {
             throw new AlreadyExistsException("Категория с таким именем уже существует: " + category.getName());
         } else {
             savedCategory.setName(category.getName());
-            return CategoryMapper.toDto(categoryRepository.save(savedCategory));
+            return categoryMapper.toDto(categoryRepository.save(savedCategory));
         }
     }
 }
