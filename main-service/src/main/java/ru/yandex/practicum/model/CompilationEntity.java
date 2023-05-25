@@ -1,9 +1,7 @@
 package ru.yandex.practicum.model;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -12,9 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "compilations")
-@Getter
-@Setter
-@ToString
+@Data
 @RequiredArgsConstructor
 public class CompilationEntity {
 

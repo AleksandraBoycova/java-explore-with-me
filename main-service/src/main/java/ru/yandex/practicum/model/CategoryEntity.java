@@ -1,9 +1,7 @@
 package ru.yandex.practicum.model;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -11,9 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "categories")
-@Getter
-@Setter
-@ToString
+@Data
 @RequiredArgsConstructor
 public class CategoryEntity {
     @Id

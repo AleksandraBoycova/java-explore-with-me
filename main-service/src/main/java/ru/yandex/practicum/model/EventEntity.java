@@ -2,10 +2,8 @@ package ru.yandex.practicum.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jdk.jfr.Timestamp;
-import lombok.Getter;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Cascade;
 import ru.practicum.event.State;
@@ -17,9 +15,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "events")
-@Getter
-@Setter
-@ToString
+@Data
 @RequiredArgsConstructor
 public class EventEntity {
     @Id

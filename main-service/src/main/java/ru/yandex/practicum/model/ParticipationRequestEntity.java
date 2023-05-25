@@ -2,18 +2,17 @@ package ru.yandex.practicum.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jdk.jfr.Timestamp;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.practicum.event.State;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@ToString
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
 @Table(name = "participation_requests")
 public class ParticipationRequestEntity {
