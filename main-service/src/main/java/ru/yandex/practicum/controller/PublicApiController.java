@@ -50,7 +50,6 @@ public class PublicApiController {
                                             @RequestParam(name = "from", defaultValue = "0") Integer from,
                                             @RequestParam(name = "size", defaultValue = "10") Integer size, HttpServletRequest request) {
         log.debug("Public API: Вызван метод getEventsFiltered");
-
         return eventService.getEvents(text, categoriesIds, paid, rangeStart, rangeEnd,
                 onlyAvailable, sorted, from, size, request);
     }
