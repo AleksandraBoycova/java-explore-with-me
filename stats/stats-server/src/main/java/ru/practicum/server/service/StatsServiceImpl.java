@@ -24,7 +24,7 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public void saveHit(EndpointHit endpointHit) {
-            repository.save(HitMapper.toEntity(endpointHit));
+        repository.save(HitMapper.toEntity(endpointHit));
     }
 
 

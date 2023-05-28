@@ -209,3 +209,39 @@ CREATE TABLE IF NOT EXISTS compilation_events
 )
     ON DELETE CASCADE
     );
+
+CREATE TABLE IF NOT EXISTS comments
+(
+    id
+    BIGINT
+    GENERATED
+    BY
+    DEFAULT AS
+    IDENTITY
+    PRIMARY
+    KEY,
+    text
+    VARCHAR
+(
+    700
+) NOT NULL,
+    event_id BIGINT,
+    author_id BIGINT,
+    created timestamp WITHOUT TIME ZONE,
+    CONSTRAINT fk_comments FOREIGN KEY
+(
+    event_id
+) REFERENCES events
+(
+    id
+)
+                      ON DELETE CASCADE,
+    CONSTRAINT fk_comments_users FOREIGN KEY
+(
+    author_id
+) REFERENCES users
+(
+    id
+)
+                      ON DELETE CASCADE
+    );
