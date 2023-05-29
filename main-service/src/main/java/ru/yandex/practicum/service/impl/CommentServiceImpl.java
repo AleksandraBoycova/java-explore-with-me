@@ -82,4 +82,13 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentDto> getAllComments() {
         return commentRepository.findAll().stream().map(commentMapper::toDto).collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteComment(Long userId, Long comId) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя нет "
+                + userId));
+        commentRepository.findById(comId).orElseThrow(() ->
+                new NotFoundException("Такого комментария нет " + comId));
+        commentRepository.deleteById(comId);
+    }
 }

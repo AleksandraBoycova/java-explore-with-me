@@ -87,7 +87,7 @@ public class PublicApiController {
     public CommentDto addComment(@PathVariable Long eventId, @Valid @RequestBody CommentDto comment,
                                  @PathVariable Long userId) {
         log.info("Private: Вызван метод addComment, userId eventId {} {}", userId, eventId);
-        return commentService.addComment(eventId, comment, eventId);
+        return commentService.addComment(eventId, comment, userId);
     }
 
 

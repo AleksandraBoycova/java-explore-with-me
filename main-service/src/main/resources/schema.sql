@@ -227,7 +227,7 @@ CREATE TABLE IF NOT EXISTS comments
 ) NOT NULL,
     event_id BIGINT,
     author_id BIGINT,
-    created timestamp WITHOUT TIME ZONE,
+    created_on timestamp WITHOUT TIME ZONE,
     CONSTRAINT fk_comments FOREIGN KEY
 (
     event_id

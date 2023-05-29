@@ -22,7 +22,7 @@ public class CommentEntity {
     private String text;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "author_id")
     private UserEntity author;
 
     @ManyToOne(optional = false)
@@ -31,5 +31,6 @@ public class CommentEntity {
 
     @Timestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "created_on")
     private LocalDateTime createdOn;
 }
