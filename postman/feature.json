@@ -292,7 +292,7 @@
 					"variable": [
 						{
 							"key": "userId",
-							"value": "1"
+							"value": "2"
 						}
 					]
 				}
@@ -450,7 +450,7 @@
 					"variable": [
 						{
 							"key": "userId",
-							"value": "2"
+							"value": "1"
 						}
 					]
 				}
@@ -458,7 +458,7 @@
 			"response": []
 		},
 		{
-			"name": "Добавление корректного комментария от пользователя 2",
+			"name": "Добавление корректного комментария от пользователя 1",
 			"event": [
 				{
 					"listen": "test",
@@ -526,7 +526,7 @@
 						},
 						{
 							"key": "userId",
-							"value": "2"
+							"value": "1"
 						}
 					]
 				}
@@ -704,7 +704,7 @@
 					"variable": [
 						{
 							"key": "userId",
-							"value": "2"
+							"value": "1"
 						},
 						{
 							"key": "comId",
@@ -722,7 +722,7 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 201\", function () {\r",
+							"pm.test(\"Status code is 404\", function () {\r",
 							"    pm.response.to.have.status(404);\r",
 							"});"
 						],
@@ -760,11 +760,11 @@
 					"variable": [
 						{
 							"key": "userId",
-							"value": "2"
+							"value": "1"
 						},
 						{
 							"key": "comId",
-							"value": "2"
+							"value": "12"
 						}
 					]
 				}
@@ -919,7 +919,7 @@
 					"variable": [
 						{
 							"key": "eventId",
-							"value": "2"
+							"value": "3"
 						}
 					]
 				}
@@ -1128,7 +1128,7 @@
 					"variable": [
 						{
 							"key": "userId",
-							"value": "3"
+							"value": "1"
 						}
 					]
 				}
@@ -1215,7 +1215,7 @@
 			"response": []
 		},
 		{
-			"name": "Добавление валидного комментария к событию 2 пользователя 3",
+			"name": "Добавление валидного комментария к событию 2 пользователя 1",
 			"event": [
 				{
 					"listen": "test",
@@ -1283,7 +1283,7 @@
 						},
 						{
 							"key": "userId",
-							"value": "3"
+							"value": "1"
 						}
 					]
 				}
@@ -1450,14 +1450,17 @@
 							"    pm.response.to.be.json;\r",
 							"});\r",
 							"\r",
-							"const target = pm.response.json()[0];\r",
+							"const source = pm.collectionVariables.get('response');\r",
+							"const target = pm.response.json();\r",
+							"let founded;\r",
+							"target.forEach(function(element){if (element.id == source.id) founded = element});\r",
 							"\r",
 							"pm.test(\"Комментарий должен содержать поля: id, text, author, event, createdOn\", function () {\r",
-							"pm.expect(target).to.have.property('id');\r",
-							"pm.expect(target).to.have.property('text');\r",
-							"pm.expect(target).to.have.property('author');\r",
-							"pm.expect(target).to.have.property('eventId');\r",
-							"pm.expect(target).to.have.property('createdOn');\r",
+							"pm.expect(target[0]).to.have.property('id');\r",
+							"pm.expect(target[0]).to.have.property('text');\r",
+							"pm.expect(target[0]).to.have.property('author');\r",
+							"pm.expect(target[0]).to.have.property('eventId');\r",
+							"pm.expect(target[0]).to.have.property('createdOn');\r",
 							"});\r",
 							"\r",
 							"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
