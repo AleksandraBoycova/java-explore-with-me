@@ -5,16 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.category.CategoryDto;
+import ru.practicum.comment.CommentDto;
 import ru.practicum.compilation.CompilationDto;
 import ru.practicum.compilation.NewCompilationDto;
 import ru.practicum.compilation.UpdateCompilationRequest;
 import ru.practicum.event.EventDto;
 import ru.practicum.event.UpdateEventRequest;
 import ru.practicum.user.UserDto;
-import ru.yandex.practicum.service.CategoriesService;
-import ru.yandex.practicum.service.CompilationService;
-import ru.yandex.practicum.service.EventService;
-import ru.yandex.practicum.service.UserService;
+import ru.yandex.practicum.service.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -30,6 +28,7 @@ public class AdminController {
     private final CompilationService compilationService;
     private final EventService eventService;
     private final UserService userService;
+    private final CommentService commentService;
 
     @PostMapping("/categories")
     @ResponseStatus(HttpStatus.CREATED)
@@ -116,5 +115,18 @@ public class AdminController {
     public CompilationDto updateCompilation(@PathVariable Long compId, @RequestBody UpdateCompilationRequest compil) {
         log.debug("Admin: Вызван метод updateCompilation " + compId);
         return compilationService.updateCompilation(compId, compil);
+    }
+
+    @DeleteMapping("comments/{userId}/{comId}")
+    public void deleteComment(@PathVariable Long userId, @PathVariable Long comId) {
+        log.info("Private: Вызван метод deleteComment, userId {} {} ", userId, comId);
+        commentService.deleteComment(userId, comId);
+    }
+
+
+    @PatchMapping("/comments/{comId}")
+    public CommentDto updateComment(@PathVariable Long comId, @Valid @RequestBody CommentDto comment) {
+        log.info("Admin: Вызван метод updateComment {}", comId);
+        return commentService.updateComment(comId, comment);
     }
 }
